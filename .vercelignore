@@ -1,0 +1,6 @@
+backend/
+analysis_demo/
+demo_*.sh
+*.md
+.gitignore
+env.example
