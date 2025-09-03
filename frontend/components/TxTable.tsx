@@ -138,7 +138,7 @@ const TxTable: React.FC<TxTableProps> = ({ transactions }) => {
           {transactions.map((tx) => {
             const parsed = parseTransaction(tx.parsed_json)
             const isExpanded = expandedRows.has(tx.hash)
-            
+
             return (
               <React.Fragment key={tx.hash}>
                 <tr className="table-row">
@@ -178,7 +178,7 @@ const TxTable: React.FC<TxTableProps> = ({ transactions }) => {
                     </button>
                   </td>
                 </tr>
-                
+
                 {isExpanded && (
                   <tr className="table-row">
                     <td colSpan={6} className="py-4 px-4">
@@ -197,7 +197,7 @@ const TxTable: React.FC<TxTableProps> = ({ transactions }) => {
                             </code>
                           </div>
                         </div>
-                        
+
                         {parsed && (
                           <div className="space-y-2">
                             <div>

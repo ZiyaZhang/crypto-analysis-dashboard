@@ -1,40 +1,43 @@
 import json
 import os
+from typing import Any, Dict, List
+
 import anthropic
-from typing import List, Dict, Any
 
 # Claude API配置
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
+
 
 def call_claude(prompt: str, system_prompt: str = "") -> str:
     """调用Claude API的通用函数"""
     if not CLAUDE_API_KEY:
         raise ValueError("CLAUDE_API_KEY 环境变量未设置")
-    
+
     client = anthropic.Anthropic(api_key=CLAUDE_API_KEY)
-    
+
     messages = []
     if system_prompt:
         messages.append({"role": "user", "content": f"System: {system_prompt}"})
-    
+
     messages.append({"role": "user", "content": prompt})
-    
+
     response = client.messages.create(
         model="claude-3-sonnet-20240229",
         max_tokens=2000,
         temperature=0.3,
-        messages=messages
+        messages=messages,
     )
-    
+
     return response.content[0].text.strip()
+
 
 def position_agent(txs: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
     持仓分析Agent - 分析交易者的持仓模式和策略
-    
+
     Args:
         txs: 交易记录列表
-        
+
     Returns:
         Dict: 持仓分析结果
     """
@@ -42,7 +45,7 @@ def position_agent(txs: List[Dict[str, Any]]) -> Dict[str, Any]:
     你是一个专业的加密货币持仓分析专家。请分析交易者的持仓模式和投资策略。
     必须返回严格的JSON格式，不要包含任何其他文字。
     """
-    
+
     prompt = f"""
     请分析以下交易记录，评估交易者的持仓模式和投资策略：
 
@@ -73,7 +76,7 @@ def position_agent(txs: List[Dict[str, Any]]) -> Dict[str, Any]:
       "summary": "EN: Moderate risk trader with medium-term holding strategy | CN: 中等风险交易者，采用中期持仓策略"
     }}
     """
-    
+
     try:
         result = call_claude(prompt, system_prompt)
         return json.loads(result)
@@ -88,16 +91,17 @@ def position_agent(txs: List[Dict[str, Any]]) -> Dict[str, Any]:
             "strategy_type": "unknown",
             "confidence": 0.0,
             "summary": f"EN: Analysis failed: {str(e)} | CN: 分析失败: {str(e)}",
-            "error": str(e)
+            "error": str(e),
         }
+
 
 def signal_agent(txs: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
     信号分析Agent - 分析市场信号和交易时机
-    
+
     Args:
         txs: 交易记录列表
-        
+
     Returns:
         Dict: 信号分析结果
     """
@@ -105,7 +109,7 @@ def signal_agent(txs: List[Dict[str, Any]]) -> Dict[str, Any]:
     你是一个专业的加密货币市场信号分析专家。请分析交易记录中的市场信号和交易时机。
     必须返回严格的JSON格式，不要包含任何其他文字。
     """
-    
+
     prompt = f"""
     请分析以下交易记录，识别市场信号和交易时机：
 
@@ -138,7 +142,7 @@ def signal_agent(txs: List[Dict[str, Any]]) -> Dict[str, Any]:
       "summary": "EN: Bullish sentiment with good timing and increasing volume | CN: 看涨情绪，时机把握良好，交易量增加"
     }}
     """
-    
+
     try:
         result = call_claude(prompt, system_prompt)
         return json.loads(result)
@@ -154,16 +158,17 @@ def signal_agent(txs: List[Dict[str, Any]]) -> Dict[str, Any]:
             "confidence": 0.0,
             "signals": [],
             "summary": f"EN: Signal analysis failed: {str(e)} | CN: 信号分析失败: {str(e)}",
-            "error": str(e)
+            "error": str(e),
         }
+
 
 def industry_agent(txs: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
     行业分析Agent - 分析涉及的行业和生态
-    
+
     Args:
         txs: 交易记录列表
-        
+
     Returns:
         Dict: 行业分析结果
     """
@@ -171,7 +176,7 @@ def industry_agent(txs: List[Dict[str, Any]]) -> Dict[str, Any]:
     你是一个专业的加密货币行业分析专家。请分析交易记录中涉及的行业和生态系统。
     必须返回严格的JSON格式，不要包含任何其他文字。
     """
-    
+
     prompt = f"""
     请分析以下交易记录，识别涉及的行业和生态系统：
 
@@ -202,7 +207,7 @@ def industry_agent(txs: List[Dict[str, Any]]) -> Dict[str, Any]:
       "summary": "EN: Active DeFi participant on Ethereum ecosystem | CN: 以太坊生态系统的活跃DeFi参与者"
     }}
     """
-    
+
     try:
         result = call_claude(prompt, system_prompt)
         return json.loads(result)
@@ -217,18 +222,21 @@ def industry_agent(txs: List[Dict[str, Any]]) -> Dict[str, Any]:
             "innovation_score": 0.0,
             "confidence": 0.0,
             "summary": f"EN: Industry analysis failed: {str(e)} | CN: 行业分析失败: {str(e)}",
-            "error": str(e)
+            "error": str(e),
         }
 
-def advisor_agent(position: Dict[str, Any], signals: Dict[str, Any], industry: Dict[str, Any]) -> Dict[str, Any]:
+
+def advisor_agent(
+    position: Dict[str, Any], signals: Dict[str, Any], industry: Dict[str, Any]
+) -> Dict[str, Any]:
     """
     投资顾问Agent - 综合所有分析结果，提供投资建议
-    
+
     Args:
         position: 持仓分析结果
         signals: 信号分析结果
         industry: 行业分析结果
-        
+
     Returns:
         Dict: 投资建议
     """
@@ -236,7 +244,7 @@ def advisor_agent(position: Dict[str, Any], signals: Dict[str, Any], industry: D
     你是一个专业的加密货币投资顾问。请基于持仓、信号和行业分析结果，提供综合的投资建议。
     必须返回严格的JSON格式，不要包含任何其他文字。
     """
-    
+
     prompt = f"""
     请基于以下分析结果，提供综合的投资建议：
 
@@ -277,7 +285,7 @@ def advisor_agent(position: Dict[str, Any], signals: Dict[str, Any], industry: D
       "summary": "EN: Solid portfolio with medium risk, recommend holding with monitoring | CN: 稳健的投资组合，中等风险，建议持有并持续监控"
     }}
     """
-    
+
     try:
         result = call_claude(prompt, system_prompt)
         return json.loads(result)
@@ -294,8 +302,9 @@ def advisor_agent(position: Dict[str, Any], signals: Dict[str, Any], industry: D
             "portfolio_allocation": "unknown",
             "market_outlook": "unknown",
             "summary": f"EN: Advisory analysis failed: {str(e)} | CN: 顾问分析失败: {str(e)}",
-            "error": str(e)
+            "error": str(e),
         }
+
 
 if __name__ == "__main__":
     # 测试代码
@@ -305,25 +314,24 @@ if __name__ == "__main__":
             "from": "0xabc...",
             "to": "0xdef...",
             "value": "1500000000000000000",
-            "parsed_json": '{"action": "transfer", "token": "ETH", "amount": "1.5"}'
+            "parsed_json": '{"action": "transfer", "token": "ETH", "amount": "1.5"}',
         }
     ]
-    
+
     print("测试Agent分析...")
-    
+
     try:
         position = position_agent(test_txs)
         print("持仓分析:", json.dumps(position, indent=2, ensure_ascii=False))
-        
+
         signals = signal_agent(test_txs)
         print("信号分析:", json.dumps(signals, indent=2, ensure_ascii=False))
-        
+
         industry = industry_agent(test_txs)
         print("行业分析:", json.dumps(industry, indent=2, ensure_ascii=False))
-        
+
         advisor = advisor_agent(position, signals, industry)
         print("投资建议:", json.dumps(advisor, indent=2, ensure_ascii=False))
-        
+
     except Exception as e:
         print(f"测试失败: {e}")
-

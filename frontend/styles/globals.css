@@ -6,7 +6,7 @@
   html {
     font-family: 'Inter', system-ui, sans-serif;
   }
-  
+
   body {
     @apply bg-dark-bg text-dark-text;
   }
@@ -16,37 +16,36 @@
   .card {
     @apply bg-dark-card border border-dark-border rounded-lg p-6 shadow-lg;
   }
-  
+
   .table-row {
     @apply border-b border-dark-border hover:bg-gray-800 transition-colors;
   }
-  
+
   .btn-primary {
     @apply bg-accent-blue hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors;
   }
-  
+
   .btn-secondary {
     @apply bg-dark-card hover:bg-gray-700 text-dark-text border border-dark-border font-medium py-2 px-4 rounded-lg transition-colors;
   }
-  
+
   .status-badge {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
-  
+
   .status-success {
     @apply bg-green-900 text-green-300;
   }
-  
+
   .status-warning {
     @apply bg-yellow-900 text-yellow-300;
   }
-  
+
   .status-error {
     @apply bg-red-900 text-red-300;
   }
-  
+
   .status-info {
     @apply bg-blue-900 text-blue-300;
   }
 }
-

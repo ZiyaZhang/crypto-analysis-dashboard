@@ -32,7 +32,7 @@ export default function Dashboard() {
     try {
       const response = await fetch('http://localhost:8000/transactions?limit=20')
       const data = await response.json()
-      
+
       if (data.success) {
         setTransactions(data.transactions)
       } else {
@@ -48,7 +48,7 @@ export default function Dashboard() {
     try {
       const response = await fetch('http://localhost:8000/analysis')
       const data = await response.json()
-      
+
       if (data.success) {
         setAnalysisResult(data.result)
       } else {
@@ -158,7 +158,7 @@ export default function Dashboard() {
 
             {/* Right Column - Advice Card */}
             <div className="lg:col-span-1">
-              <AdviceCard 
+              <AdviceCard
                 analysisResult={analysisResult}
                 onRefresh={refreshAnalysis}
                 loading={loading}

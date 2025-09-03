@@ -1,7 +1,8 @@
-import os
 import json
+import os
+from typing import Any, Dict
+
 import requests
-from typing import Dict, Any
 
 # DeepSeek API配置
 DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
@@ -45,19 +46,20 @@ DEEPSEEK_PROMPT = """
 }
 """
 
+
 def parse_with_deepseek(tx: Dict[str, Any]) -> str:
     """
     使用DeepSeek API解析以太坊交易数据
-    
+
     Args:
         tx: 以太坊交易数据字典
-        
+
     Returns:
         str: JSON格式的解析结果
     """
     if not DEEPSEEK_API_KEY:
         raise ValueError("DEEPSEEK_API_KEY 环境变量未设置")
-    
+
     try:
         # 准备交易数据（只保留关键字段）
         transaction_data = {
@@ -73,36 +75,37 @@ def parse_with_deepseek(tx: Dict[str, Any]) -> str:
             "methodId": tx.get("methodId", ""),
             "functionName": tx.get("functionName", ""),
             "contractAddress": tx.get("contractAddress", ""),
-            "input": tx.get("input", "")[:200] if tx.get("input") else ""  # 限制input长度
+            "input": (
+                tx.get("input", "")[:200] if tx.get("input") else ""
+            ),  # 限制input长度
         }
-        
+
         # 构建提示词
-        prompt = DEEPSEEK_PROMPT.format(transaction_data=json.dumps(transaction_data, indent=2))
-        
+        prompt = DEEPSEEK_PROMPT.format(
+            transaction_data=json.dumps(transaction_data, indent=2)
+        )
+
         # 调用DeepSeek API
         headers = {
             "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
-        
+
         payload = {
             "model": "deepseek-chat",
-            "messages": [
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
+            "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.1,
-            "max_tokens": 1000
+            "max_tokens": 1000,
         }
-        
-        response = requests.post(DEEPSEEK_API_URL, headers=headers, json=payload, timeout=30)
+
+        response = requests.post(
+            DEEPSEEK_API_URL, headers=headers, json=payload, timeout=30
+        )
         response.raise_for_status()
-        
+
         result = response.json()
         result_text = result["choices"][0]["message"]["content"].strip()
-        
+
         # 验证JSON格式
         try:
             parsed_result = json.loads(result_text)
@@ -111,9 +114,9 @@ def parse_with_deepseek(tx: Dict[str, Any]) -> str:
             for field in required_fields:
                 if field not in parsed_result:
                     parsed_result[field] = None
-            
+
             return json.dumps(parsed_result, ensure_ascii=False)
-            
+
         except json.JSONDecodeError as e:
             # 如果返回的不是有效JSON，返回默认结构
             default_result = {
@@ -126,10 +129,10 @@ def parse_with_deepseek(tx: Dict[str, Any]) -> str:
                 "risk_level": "medium",
                 "gas_used": tx.get("gasUsed", "0"),
                 "gas_price": tx.get("gasPrice", "0"),
-                "error": f"JSON解析错误: {str(e)}"
+                "error": f"JSON解析错误: {str(e)}",
             }
             return json.dumps(default_result, ensure_ascii=False)
-            
+
     except Exception as e:
         # 发生错误时返回默认结构
         error_result = {
@@ -142,24 +145,25 @@ def parse_with_deepseek(tx: Dict[str, Any]) -> str:
             "risk_level": "high",
             "gas_used": tx.get("gasUsed", "0"),
             "gas_price": tx.get("gasPrice", "0"),
-            "error": str(e)
+            "error": str(e),
         }
         return json.dumps(error_result, ensure_ascii=False)
+
 
 def parse_transaction_simple(tx: Dict[str, Any]) -> Dict[str, Any]:
     """
     简单解析交易数据（当API不可用时使用）
-    
+
     Args:
         tx: 以太坊交易数据字典
-        
+
     Returns:
         Dict: 解析结果
     """
     # 简单的交易类型判断
     value = int(tx.get("value", "0"))
     is_contract = tx.get("contractAddress", "") != ""
-    
+
     if value > 0 and not is_contract:
         action = "transfer"
         token = "ETH"
@@ -169,7 +173,7 @@ def parse_transaction_simple(tx: Dict[str, Any]) -> Dict[str, Any]:
     else:
         action = "unknown"
         token = "ETH"
-    
+
     return {
         "action": action,
         "token": token,
@@ -179,8 +183,9 @@ def parse_transaction_simple(tx: Dict[str, Any]) -> Dict[str, Any]:
         "description": f"EN: {action} transaction | CN: {action} 交易",
         "risk_level": "medium",
         "gas_used": tx.get("gasUsed", "0"),
-        "gas_price": tx.get("gasPrice", "0")
+        "gas_price": tx.get("gasPrice", "0"),
     }
+
 
 if __name__ == "__main__":
     # 测试代码
@@ -193,9 +198,9 @@ if __name__ == "__main__":
         "gas": "21000",
         "gasPrice": "20000000000",
         "gasUsed": "21000",
-        "isError": "0"
+        "isError": "0",
     }
-    
+
     try:
         result = parse_with_deepseek(test_tx)
         print("DeepSeek解析结果:")
