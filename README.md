@@ -1,196 +1,169 @@
-<p align="center">
-  <img src="assets/logo.jpg" width="200"/>
-</p>
+# Crypto Analysis Dashboard
 
-English | [中文](README_zh.md) | [한국어](README_ko.md) | [日本語](README_ja.md)
+一个基于 OpenManus 框架的加密货币交易分析系统，使用多 Agent 架构进行智能分析。
 
-[![GitHub stars](https://img.shields.io/github/stars/FoundationAgents/OpenManus?style=social)](https://github.com/FoundationAgents/OpenManus/stargazers)
-&ensp;
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) &ensp;
-[![Discord Follow](https://dcbadge.vercel.app/api/server/DYn29wFk9z?style=flat)](https://discord.gg/DYn29wFk9z)
-[![Demo](https://img.shields.io/badge/Demo-Hugging%20Face-yellow)](https://huggingface.co/spaces/lyh-917/OpenManusDemo)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15186407.svg)](https://doi.org/10.5281/zenodo.15186407)
+## 功能特性
 
-# 👋 OpenManus
+- 🔍 **交易数据获取**: 通过 Etherscan API 获取以太坊交易记录
+- 🤖 **AI 解析**: 使用 Claude API 智能解析交易类型和风险
+- 🧠 **多 Agent 分析**: 持仓分析、信号分析、行业分析、投资建议
+- 📊 **可视化 Dashboard**: 深色主题的现代化前端界面
+- 💾 **数据存储**: SQLite 数据库存储交易和分析结果
 
-Manus is incredible, but OpenManus can achieve any idea without an *Invite Code* 🛫!
+## 系统架构
 
-Our team members [@Xinbin Liang](https://github.com/mannaandpoem) and [@Jinyu Xiang](https://github.com/XiangJinyu) (core authors), along with [@Zhaoyang Yu](https://github.com/MoshiQAQ), [@Jiayi Zhang](https://github.com/didiforgithub), and [@Sirui Hong](https://github.com/stellaHSR), we are from [@MetaGPT](https://github.com/geekan/MetaGPT). The prototype is launched within 3 hours and we are keeping building!
-
-It's a simple implementation, so we welcome any suggestions, contributions, and feedback!
-
-Enjoy your own agent with OpenManus!
-
-We're also excited to introduce [OpenManus-RL](https://github.com/OpenManus/OpenManus-RL), an open-source project dedicated to reinforcement learning (RL)- based (such as GRPO) tuning methods for LLM agents, developed collaboratively by researchers from UIUC and OpenManus.
-
-## Project Demo
-
-<video src="https://private-user-images.githubusercontent.com/61239030/420168772-6dcfd0d2-9142-45d9-b74e-d10aa75073c6.mp4?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDEzMTgwNTksIm5iZiI6MTc0MTMxNzc1OSwicGF0aCI6Ii82MTIzOTAzMC80MjAxNjg3NzItNmRjZmQwZDItOTE0Mi00NWQ5LWI3NGUtZDEwYWE3NTA3M2M2Lm1wND9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTAzMDclMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwMzA3VDAzMjIzOVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTdiZjFkNjlmYWNjMmEzOTliM2Y3M2VlYjgyNDRlZDJmOWE3NWZhZjE1MzhiZWY4YmQ3NjdkNTYwYTU5ZDA2MzYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.UuHQCgWYkh0OQq9qsUWqGsUbhG3i9jcZDAMeHjLt5T4" data-canonical-src="https://private-user-images.githubusercontent.com/61239030/420168772-6dcfd0d2-9142-45d9-b74e-d10aa75073c6.mp4?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDEzMTgwNTksIm5iZiI6MTc0MTMxNzc1OSwicGF0aCI6Ii82MTIzOTAzMC80MjAxNjg3NzItNmRjZmQwZDItOTE0Mi00NWQ5LWI3NGUtZDEwYWE3NTA3M2M2Lm1wND9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTAzMDclMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwMzA3VDAzMjIzOVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTdiZjFkNjlmYWNjMmEzOTliM2Y3M2VlYjgyNDRlZDJmOWE3NWZhZjE1MzhiZWY4YmQ3NjdkNTYwYTU5ZDA2MzYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.UuHQCgWYkh0OQq9qsUWqGsUbhG3i9jcZDAMeHjLt5T4" controls="controls" muted="muted" class="d-block rounded-bottom-2 border-top width-fit" style="max-height:640px; min-height: 200px"></video>
-
-## Installation
-
-We provide two installation methods. Method 2 (using uv) is recommended for faster installation and better dependency management.
-
-### Method 1: Using conda
-
-1. Create a new conda environment:
-
-```bash
-conda create -n open_manus python=3.12
-conda activate open_manus
+```
+├── backend/           # FastAPI 后端服务
+│   ├── main.py       # API 接口
+│   ├── db.py         # 数据库操作
+│   └── parser.py     # Claude 交易解析
+├── analysis_demo/    # 多 Agent 分析模块
+│   ├── agents.py     # Agent 定义
+│   ├── workflow.py   # 工作流配置
+│   └── run.py        # 分析执行脚本
+└── frontend/         # Next.js 前端界面
+    ├── pages/        # 页面组件
+    └── components/   # UI 组件
 ```
 
-2. Clone the repository:
+## 快速开始
+
+### 1. 环境准备
+
+确保已安装以下软件：
+- Python 3.8+
+- Node.js 16+
+- npm 或 yarn
+
+### 2. 设置环境变量
+
+创建 `.env` 文件并设置必要的 API 密钥：
 
 ```bash
-git clone https://github.com/FoundationAgents/OpenManus.git
-cd OpenManus
+# Etherscan API 密钥
+export ETHERSCAN_API_KEY="your_etherscan_api_key"
+
+# Claude API 密钥
+export CLAUDE_API_KEY="your_claude_api_key"
 ```
 
-3. Install dependencies:
+### 3. 安装依赖
 
+#### 后端依赖
 ```bash
+cd backend
 pip install -r requirements.txt
 ```
 
-### Method 2: Using uv (Recommended)
+#### 分析模块依赖
+```bash
+cd analysis_demo
+pip install -r requirements.txt
+```
 
-1. Install uv (A fast Python package installer and resolver):
+#### 前端依赖
+```bash
+cd frontend
+npm install
+```
+
+### 4. 启动服务
+
+#### 启动后端服务
+```bash
+cd backend
+uvicorn main:app --reload --port 8000
+```
+
+#### 启动前端服务
+```bash
+cd frontend
+npm run dev
+```
+
+### 5. 使用演示
+
+1. **获取交易数据**:
+   ```bash
+   curl "http://localhost:8000/fetch_eth/0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6?limit=10"
+   ```
+
+2. **运行分析**:
+   ```bash
+   cd analysis_demo
+   python run.py
+   ```
+
+3. **查看 Dashboard**:
+   打开浏览器访问 `http://localhost:3000`
+
+## API 接口
+
+### 后端 API
+
+- `GET /` - API 信息
+- `GET /health` - 健康检查
+- `GET /fetch_eth/{address}` - 获取以太坊地址交易
+- `GET /transactions` - 获取存储的交易记录
+- `GET /analysis` - 获取分析结果
+
+### 示例请求
 
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# 获取交易记录
+curl "http://localhost:8000/transactions?limit=20"
+
+# 获取分析结果
+curl "http://localhost:8000/analysis"
 ```
 
-2. Clone the repository:
+## 多 Agent 分析
 
-```bash
-git clone https://github.com/FoundationAgents/OpenManus.git
-cd OpenManus
-```
+系统包含四个专业 Agent：
 
-3. Create a new virtual environment and activate it:
+1. **Position Agent**: 分析持仓模式和投资策略
+2. **Signal Agent**: 分析市场信号和交易时机
+3. **Industry Agent**: 分析行业和生态系统
+4. **Advisor Agent**: 提供综合投资建议
 
-```bash
-uv venv --python 3.12
-source .venv/bin/activate  # On Unix/macOS
-# Or on Windows:
-# .venv\Scripts\activate
-```
+## 前端界面
 
-4. Install dependencies:
+- 🎨 **深色主题**: 现代化的深色界面设计
+- 📱 **响应式布局**: 支持桌面和移动设备
+- 📊 **数据可视化**: 使用 Recharts 展示分析结果
+- 🔄 **实时更新**: 支持手动刷新数据和重新分析
 
-```bash
-uv pip install -r requirements.txt
-```
+## 开发说明
 
-### Browser Automation Tool (Optional)
-```bash
-playwright install
-```
+### 项目结构
 
-## Configuration
+- `backend/`: FastAPI 后端服务，提供 REST API
+- `analysis_demo/`: 多 Agent 分析模块，基于 OpenManus 框架
+- `frontend/`: Next.js 前端应用，提供用户界面
 
-OpenManus requires configuration for the LLM APIs it uses. Follow these steps to set up your configuration:
+### 技术栈
 
-1. Create a `config.toml` file in the `config` directory (you can copy from the example):
+- **后端**: FastAPI, SQLite, Anthropic Claude API
+- **分析**: OpenManus 框架, 多 Agent 架构
+- **前端**: Next.js, React, TypeScript, Tailwind CSS, Recharts
 
-```bash
-cp config/config.example.toml config/config.toml
-```
+### 扩展开发
 
-2. Edit `config/config.toml` to add your API keys and customize settings:
+1. **添加新的 Agent**: 在 `analysis_demo/agents.py` 中定义新的分析 Agent
+2. **自定义工作流**: 修改 `analysis_demo/workflow.py` 中的工作流配置
+3. **扩展前端组件**: 在 `frontend/components/` 中添加新的 UI 组件
 
-```toml
-# Global LLM configuration
-[llm]
-model = "gpt-4o"
-base_url = "https://api.openai.com/v1"
-api_key = "sk-..."  # Replace with your actual API key
-max_tokens = 4096
-temperature = 0.0
+## 注意事项
 
-# Optional configuration for specific LLM models
-[llm.vision]
-model = "gpt-4o"
-base_url = "https://api.openai.com/v1"
-api_key = "sk-..."  # Replace with your actual API key
-```
+- 本项目仅供学习和研究使用
+- 请确保 API 密钥的安全性
+- 生产环境使用请添加适当的错误处理和日志记录
+- 建议定期备份数据库文件
 
-## Quick Start
+## 许可证
 
-One line for run OpenManus:
+MIT License
 
-```bash
-python main.py
-```
+## 贡献
 
-Then input your idea via terminal!
-
-For MCP tool version, you can run:
-```bash
-python run_mcp.py
-```
-
-For unstable multi-agent version, you also can run:
-
-```bash
-python run_flow.py
-```
-
-### Custom Adding Multiple Agents
-
-Currently, besides the general OpenManus Agent, we have also integrated the DataAnalysis Agent, which is suitable for data analysis and data visualization tasks. You can add this agent to `run_flow` in `config.toml`.
-
-```toml
-# Optional configuration for run-flow
-[runflow]
-use_data_analysis_agent = true     # Disabled by default, change to true to activate
-```
-In addition, you need to install the relevant dependencies to ensure the agent runs properly: [Detailed Installation Guide](app/tool/chart_visualization/README.md##Installation)
-
-## How to contribute
-
-We welcome any friendly suggestions and helpful contributions! Just create issues or submit pull requests.
-
-Or contact @mannaandpoem via 📧email: mannaandpoem@gmail.com
-
-**Note**: Before submitting a pull request, please use the pre-commit tool to check your changes. Run `pre-commit run --all-files` to execute the checks.
-
-## Community Group
-Join our networking group on Feishu and share your experience with other developers!
-
-<div align="center" style="display: flex; gap: 20px;">
-    <img src="assets/community_group.jpg" alt="OpenManus 交流群" width="300" />
-</div>
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=FoundationAgents/OpenManus&type=Date)](https://star-history.com/#FoundationAgents/OpenManus&Date)
-
-## Sponsors
-Thanks to [PPIO](https://ppinfra.com/user/register?invited_by=OCPKCN&utm_source=github_openmanus&utm_medium=github_readme&utm_campaign=link) for computing source support.
-> PPIO: The most affordable and easily-integrated MaaS and GPU cloud solution.
-
-
-## Acknowledgement
-
-Thanks to [anthropic-computer-use](https://github.com/anthropics/anthropic-quickstarts/tree/main/computer-use-demo)
-and [browser-use](https://github.com/browser-use/browser-use) for providing basic support for this project!
-
-Additionally, we are grateful to [AAAJ](https://github.com/metauto-ai/agent-as-a-judge), [MetaGPT](https://github.com/geekan/MetaGPT), [OpenHands](https://github.com/All-Hands-AI/OpenHands) and [SWE-agent](https://github.com/SWE-agent/SWE-agent).
-
-We also thank stepfun(阶跃星辰) for supporting our Hugging Face demo space.
-
-OpenManus is built by contributors from MetaGPT. Huge thanks to this agent community!
-
-## Cite
-```bibtex
-@misc{openmanus2025,
-  author = {Xinbin Liang and Jinyu Xiang and Zhaoyang Yu and Jiayi Zhang and Sirui Hong and Sheng Fan and Xiao Tang},
-  title = {OpenManus: An open-source framework for building general AI agents},
-  year = {2025},
-  publisher = {Zenodo},
-  doi = {10.5281/zenodo.15186407},
-  url = {https://doi.org/10.5281/zenodo.15186407},
-}
-```
+欢迎提交 Issue 和 Pull Request 来改进项目。
